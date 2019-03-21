@@ -31,8 +31,8 @@ class Storage(BaseStorage):
         if self.shared_client:
             parent = Storage
         if not parent.bucket:
-            bucket_id  = self.context.config.get("RESULT_STORAGE_CLOUD_STORAGE_BUCKET_ID")
-            project_id = self.context.config.get("RESULT_STORAGE_CLOUD_STORAGE_PROJECT_ID")
+            bucket_id  = self.context.config.get("STORAGE_CLOUD_STORAGE_BUCKET_ID")
+            project_id = self.context.config.get("STORAGE_CLOUD_STORAGE_PROJECT_ID")
             client = storage.Client(project_id)
             parent.bucket = client.get_bucket(bucket_id)
         return parent.bucket
@@ -41,9 +41,9 @@ class Storage(BaseStorage):
     def is_auto_webp(self):
         return self.context.config.AUTO_WEBP and self.context.request.accepts_webp
 
-    def put(self, bytes):
+    def put(self, path, bytes):
         file_abspath = self.normalize_path(self.context.request.url)
-        logger.debug("[RESULT_STORAGE] putting at %s" % file_abspath)
+        logger.debug("[STORAGE] putting at %s" % file_abspath)
         bucket = self.get_bucket()
 
         blob = bucket.blob(file_abspath)
@@ -57,15 +57,21 @@ class Storage(BaseStorage):
                 mime = BaseEngine.get_mimetype(bytes)
                 blob.content_type = mime
             except:
-                logger.debug("[RESULT_STORAGE] Couldn't determine mimetype")
+                logger.debug("[STORAGE] Couldn't determine mimetype")
 
 
         blob.patch()
 
-    def get(self):
-        path = self.context.request.url
+    def put_crypto(self, path):
+        '''
+        :param path: ignored. always returns None
+        :return: None, this is not supported
+        '''
+        return
+
+    def get(self, path):
         file_abspath = self.normalize_path(path)
-        logger.debug("[RESULT_STORAGE] getting from %s" % file_abspath)
+        logger.debug("[STORAGE] getting from %s" % file_abspath)
 
         bucket = self.get_bucket()
         blob = bucket.get_blob(file_abspath)
@@ -74,7 +80,7 @@ class Storage(BaseStorage):
         return blob.download_as_string()
 
     def normalize_path(self, path):
-        path_segments = [self.context.config.get('RESULT_STORAGE_CLOUD_STORAGE_ROOT_PATH','thumbor/result_storage').rstrip('/'), Storage.PATH_FORMAT_VERSION, ]
+        path_segments = [self.context.config.get('STORAGE_CLOUD_STORAGE_ROOT_PATH','thumbor/storage').rstrip('/'), Storage.PATH_FORMAT_VERSION, ]
         if self.is_auto_webp:
             path_segments.append("webp")
 
@@ -88,7 +94,7 @@ class Storage(BaseStorage):
         return join("".join(path[0:2]), "".join(path[2:4]))
 
     def is_expired(self, blob):
-        expire_in_seconds = self.context.config.get('RESULT_STORAGE_EXPIRATION_SECONDS', None)
+        expire_in_seconds = self.context.config.get('STORAGE_EXPIRATION_SECONDS', None)
 
         if expire_in_seconds is None or expire_in_seconds == 0:
             return False
@@ -99,13 +105,21 @@ class Storage(BaseStorage):
     def last_updated(self):
         path = self.context.request.url
         file_abspath = self.normalize_path(path)
-        logger.debug("[RESULT_STORAGE] getting from %s" % file_abspath)
+        logger.debug("[STORAGE] getting from %s" % file_abspath)
 
         bucket = self.get_bucket()
         blob = bucket.get_blob(file_abspath)
 
         if not blob or self.is_expired(blob):
-            logger.debug("[RESULT_STORAGE] image not found at %s" % file_abspath)
+            logger.debug("[STORAGE] image not found at %s" % file_abspath)
             return True
 
         return blob.updated
+
+    def exists(self, path):
+        file_abspath = self.normalize_path(path)
+        logger.debug("[STORAGE] getting from %s" % file_abspath)
+
+        bucket = self.get_bucket()
+        blob = bucket.get_blob(file_abspath)
+        return blob and not self.is_expired(blob)

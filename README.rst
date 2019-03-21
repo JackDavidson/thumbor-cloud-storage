@@ -51,4 +51,19 @@ When ``thumbor_cloud_storage.result_storages.cloud_storage`` is enabled:
     RESULT_STORAGE = 'thumbor_cloud_storage.result_storages.cloud_storage'
     RESULT_STORAGE_CLOUD_STORAGE_PROJECT_ID = ''
     RESULT_STORAGE_CLOUD_STORAGE_BUCKET_ID = ''
+    RESULT_STORAGE_EXPIRATION_SECONDS = 0
+    RESULT_STORAGE_CLOUD_STORAGE_ROOT_PATH='thumbor/storage'
+
+Storage settings
+~~~~~~~~~~~~~~~~
+
+When ``thumbor_cloud_storage.storages.cloud_storage`` is enabled:
+
+.. code:: python
+
+    STORAGE = 'thumbor_cloud_storage.storages.cloud_storage'
+    STORAGE_CLOUD_STORAGE_PROJECT_ID = ''
+    STORAGE_CLOUD_STORAGE_BUCKET_ID = ''
+    STORAGE_EXPIRATION_SECONDS = 0
+    STORAGE_CLOUD_STORAGE_ROOT_PATH='thumbor/storage'
 
