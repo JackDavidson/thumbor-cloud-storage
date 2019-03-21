@@ -52,7 +52,7 @@ When ``thumbor_cloud_storage.result_storages.cloud_storage`` is enabled:
     RESULT_STORAGE_CLOUD_STORAGE_PROJECT_ID = ''
     RESULT_STORAGE_CLOUD_STORAGE_BUCKET_ID = ''
     RESULT_STORAGE_EXPIRATION_SECONDS = 0
-    RESULT_STORAGE_CLOUD_STORAGE_ROOT_PATH='thumbor/storage'
+    RESULT_STORAGE_CLOUD_STORAGE_ROOT_PATH='thumbor/result_storage'
 
 Storage settings
 ~~~~~~~~~~~~~~~~
