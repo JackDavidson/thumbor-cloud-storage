@@ -42,7 +42,7 @@ class Storage(BaseStorage):
         return self.context.config.AUTO_WEBP and self.context.request.accepts_webp
 
     def put(self, path, bytes):
-        file_abspath = self.normalize_path(self.context.request.url)
+        file_abspath = self.normalize_path(path)
         logger.debug("[STORAGE] putting at %s" % file_abspath)
         bucket = self.get_bucket()
 
